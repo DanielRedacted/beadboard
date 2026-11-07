@@ -3,7 +3,7 @@
 // Does nothing in a plain browser.
 const T = window.__TAURI__;
 const RELEASES = 'https://github.com/DanielRedacted/beadboard/releases/latest';
-const DAY = 24 * 60 * 60 * 1000;
+const RECHECK = 6 * 60 * 60 * 1000; // while the app stays open
 const $ = s => document.querySelector(s);
 
 export const openReleases = () => (T?.opener ? T.opener.openUrl(RELEASES) : window.open(RELEASES, '_blank'));
@@ -27,19 +27,16 @@ export function initUpdater({ flush, tell }) {
     banner.hidden = false;
   }
 
-  // silent: launch check. Quiet when up to date or offline, and at most once a day unless an update was found.
+  // silent: automatic check (on launch and every few hours). Quiet when up to date or offline.
+  // The check is one small JSON request, so there's no need to throttle it further.
   async function check(silent) {
     if (!T?.updater) return silent ? undefined : tell('Updates are available in the installed app only.');
-    if (busy) return;
-    if (silent && Date.now() - (+localStorage.lastUpdateCheck || 0) < DAY) return;
+    if (busy || (silent && !banner.hidden)) return;
     busy = true;
     try {
       const u = await T.updater.check();
       if (u) offer(u);
-      else {
-        localStorage.lastUpdateCheck = Date.now();
-        if (!silent) await tell(`You have the latest version (${await T.app.getVersion()}).`);
-      }
+      else if (!silent) await tell(`You have the latest version (${await T.app.getVersion()}).`);
     } catch (e) {
       console.error('update check failed', e);
       if (!silent) {
@@ -84,6 +81,9 @@ export function initUpdater({ flush, tell }) {
   };
   $('#notes-close').onclick = () => $('#notes-dlg').close();
 
-  if (T?.updater) setTimeout(() => check(true), 5000);
+  if (T?.updater) {
+    setTimeout(() => check(true), 5000);
+    setInterval(() => check(true), RECHECK);
+  }
   return { check };
 }

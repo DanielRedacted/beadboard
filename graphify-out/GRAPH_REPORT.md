@@ -1,12 +1,19 @@
 # Graph Report - jess-gift  (2026-11-07)
 
 ## Corpus Check
-- Corpus is ~18,378 words - fits in a single context window. You may not need a graph.
+- 26 files · ~18,394 words
+- Verdict: corpus is large enough that graph structure adds value.
+- Unclassified: 6 file(s) not represented in the graph (top: (none) 3, .icns 1, .ico 1)
 
 ## Summary
 - 368 nodes · 693 edges · 20 communities (14 shown, 6 thin omitted)
 - Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 27 edges (avg confidence: 0.84)
-- Token cost: 108,889 input · 0 output
+- Token cost: 0 input · 0 output
+
+## Graph Freshness
+- Built from commit: `a262f137`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - UI Controller & Canvas Events
@@ -42,9 +49,9 @@
 ## Surprising Connections (you probably didn't know these)
 - `render()` --indirect_call--> `edit()`  [INFERRED]
   src/board.js → scripts/release.mjs
-- `Beadboard` --shares_data_with--> `Photo underlay & opacity toggle`  [INFERRED]
-  README.md → src/index.html
 - `Where data lives (app-data folder)` --conceptually_related_to--> `My Designs gallery (#gallery-dlg)`  [INFERRED]
+  README.md → src/index.html
+- `Beadboard` --shares_data_with--> `Photo underlay & opacity toggle`  [INFERRED]
   README.md → src/index.html
 - `Beadboard` --conceptually_related_to--> `App shell (#app)`  [INFERRED]
   README.md → src/index.html
@@ -117,7 +124,7 @@ Cohesion: 0.47
 Nodes (4): initUpdater(), check(), offer(), openReleases()
 
 ## Knowledge Gaps
-- **13 isolated node(s):** `beadboard`, `macOS install warning`, `Windows install warning`, `src/core.js logic tests`, `GitHub Actions build/publish` (+8 more)
+- **13 isolated node(s):** `beadboard`, `App Icon: Bead Heart on Pegboard`, `app.js (main script)`, `Photo underlay & opacity toggle`, `Color-pick canvas & loupe (#pick-canvas)` (+8 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 140 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -128,7 +135,7 @@ _Questions this graph is uniquely positioned to answer:_
   _High betweenness centrality (0.026) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `initPalette()` (e.g. with `open()` and `render()`) actually correct?**
   _`initPalette()` has 2 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `beadboard`, `macOS install warning`, `Windows install warning` to the rest of the system?**
+- **What connects `beadboard`, `App Icon: Bead Heart on Pegboard`, `app.js (main script)` to the rest of the system?**
   _13 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `UI Controller & Canvas Events` be split into smaller, more focused modules?**
   _Cohesion score 0.06057945566286216 - nodes in this community are weakly interconnected._
