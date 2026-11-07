@@ -1,6 +1,6 @@
 [package]
 name = "beadboard"
-version = "0.3.2"
+version = "0.3.3"
 description = "Pixel-art template designer for beads and LEGO"
 authors = ["Daniel"]
 edition = "2024"
