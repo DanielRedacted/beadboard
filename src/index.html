@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title></title>
+  <link rel="stylesheet" href="style.css" />
+  <style id="page-style"></style>
+  <script type="module" src="app.js"></script>
+</head>
+<body class="no-design">
+  <div id="app">
+    <header id="top">
+      <nav id="menubar" aria-label="Menu"></nav>
+      <input id="name" class="needs-design" aria-label="Design name" placeholder="Untitled" spellcheck="false" />
+      <span id="save-status" class="needs-design" role="status"></span>
+      <span class="spacer"></span>
+      <span id="hl-chip" hidden>Highlighting <b></b><button type="button" id="hl-clear" aria-label="Stop highlighting">✕</button></span>
+      <button id="btn-photo-toggle" class="toggle" hidden title="Show the photo under the design (⇧⌘P)">
+        <svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></svg><span>Photo</span></button>
+      <label id="opacity-wrap" hidden title="How strongly the beads cover the photo"><span>Beads</span><input type="range" id="opacity" min="0" max="1" step="0.05" value="0.85" /></label>
+      <button id="btn-ironed" class="toggle bead-only needs-design" title="Preview how the piece looks after ironing / fusing (⇧⌘L)">
+        <svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2" /><rect x="13" y="4" width="7" height="7" rx="2" /><rect x="4" y="13" width="7" height="7" rx="2" /><rect x="13" y="13" width="7" height="7" rx="2" /></svg><span>Ironed</span></button>
+    </header>
+
+    <nav id="tools" class="needs-design" aria-label="Tools">
+      <button data-tool="pencil" title="Pencil (B). Recolors the top piece; with Empty selected it erases.">
+        <svg viewBox="0 0 24 24"><path d="M4 20l1-4L16 5l3 3L8 19z M14 7l3 3" /></svg><span>Pencil</span></button>
+      <button data-tool="stack" class="stack-only" title="Stack (S): add a plate on top. Shift-click with the pencil does the same.">
+        <svg viewBox="0 0 24 24"><path d="M5 16h14v4H5z M7 11h10v4H7z M9 6h6v4H9z" /></svg><span>Stack</span></button>
+      <button data-tool="erase" title="Eraser (E). Right-click also erases.">
+        <svg viewBox="0 0 24 24"><path d="M4 16l9-9 6 6-6 6H7z M9 11l6 6 M13 19h7" /></svg><span>Erase</span></button>
+      <button data-tool="fill" title="Fill (G). With Empty selected it clears an area.">
+        <svg viewBox="0 0 24 24"><path d="M4 11l7-7 8 8-7 7z M4 11h15 M20 15c1 2 1 4 0 4s-1-2 0-4z" /></svg><span>Fill</span></button>
+      <button data-tool="picker" title="Pick a color from the grid (I)">
+        <svg viewBox="0 0 24 24"><path d="M14 4l6 6-2 2-6-6z M13 9l-8 8v3h3l8-8" /></svg><span>Pick</span></button>
+      <button data-tool="hand" title="Pan (H). Two fingers or scrolling also pan.">
+        <svg viewBox="0 0 24 24"><path d="M8 12V6a1.5 1.5 0 013 0v5V4a1.5 1.5 0 013 0v7V6a1.5 1.5 0 013 0v8c0 4-3 6-6 6s-4-1-6-4l-2-3a1.5 1.5 0 012.5-1.5z" /></svg><span>Pan</span></button>
+      <hr class="touch-only" />
+      <button id="btn-undo" class="touch-only" title="Undo (two-finger tap)"><svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5 M4 9h10a6 6 0 010 12h-3" /></svg><span>Undo</span></button>
+      <button id="btn-redo" class="touch-only" title="Redo (three-finger tap)"><svg viewBox="0 0 24 24"><path d="M15 14l5-5-5-5 M20 9H10a6 6 0 000 12h3" /></svg><span>Redo</span></button>
+      <hr />
+      <button id="btn-zoom-in" title="Zoom in"><svg viewBox="0 0 24 24"><path d="M12 5v14 M5 12h14" /></svg><span>Zoom</span></button>
+      <button id="btn-zoom-out" title="Zoom out"><svg viewBox="0 0 24 24"><path d="M5 12h14" /></svg><span>Zoom</span></button>
+      <button id="btn-fit" title="Fit to window"><svg viewBox="0 0 24 24"><path d="M4 9V4h5 M15 4h5v5 M20 15v5h-5 M9 20H4v-5" /></svg><span>Fit</span></button>
+    </nav>
+
+    <main id="stage">
+      <div class="pane" id="editor-wrap">
+        <canvas id="editor"></canvas>
+        <div id="empty">
+          <p>No design open.</p>
+          <button id="btn-empty-new" class="primary">New design</button>
+          <button id="btn-empty-gallery">My Designs</button>
+        </div>
+        <div id="place-bar">
+          <span class="hint-text">Drag to move · scroll or pinch to zoom</span>
+          <label><input type="checkbox" id="dither" /> Dither</label>
+          <label><input type="checkbox" id="flip" /> Flip</label>
+          <span class="spacer"></span>
+          <button id="place-cancel">Cancel</button>
+          <button id="place-apply" class="primary">Apply</button>
+        </div>
+      </div>
+      <div class="pane lego-only" id="iso-wrap">
+        <canvas id="iso" title="Drag to move, pinch or ⌘-scroll to zoom, double-click to reset"></canvas>
+        <div class="iso-bar">
+          <button id="iso-left" title="Rotate left">⟲</button>
+          <span>3D</span>
+          <button id="iso-right" title="Rotate right">⟳</button>
+        </div>
+      </div>
+    </main>
+
+    <aside id="palette" class="needs-design">
+      <div class="pal-head">
+        <button id="btn-highlight" class="toggle" title="Dim every other color (⇧⌘H)">Highlight</button>
+        <button id="btn-edit-color" title="Edit the selected color (or double-click a swatch)">Edit</button>
+        <button id="btn-add-color" class="primary" title="Add a color">+ Add</button>
+      </div>
+      <div id="color-info"></div>
+      <div id="swatches"></div>
+    </aside>
+  </div>
+
+  <input type="file" id="photo-file" accept="image/*,.heic,.heif" hidden />
+  <input type="file" id="import-file" accept=".json,application/json" hidden />
+
+  <dialog id="board-dlg">
+    <form id="board-form">
+      <h2 id="board-title">New design</h2>
+      <div class="bd">
+        <div class="bd-left">
+          <label class="new-only name-field">Name <input id="b-name" placeholder="Untitled" autocomplete="off" /></label>
+          <section class="new-only"><h3>What are you making?</h3><div id="b-media" class="opts"></div></section>
+          <section class="new-only lego-only-b"><h3>LEGO pieces</h3><div id="b-parts" class="opts"></div></section>
+          <section><h3>Board</h3><div id="b-presets" class="opts small"></div></section>
+          <section id="b-custom">
+            <div class="row">
+              <label class="no-lego">Shape
+                <select id="b-shape"><option value="rect">Square / rectangle</option><option value="hex">Hexagon</option></select></label>
+              <label class="rect-only">Width <input id="b-w" type="number" min="1" max="128" /></label>
+              <label class="rect-only">Height <input id="b-h" type="number" min="1" max="128" /></label>
+              <label class="hex-only">Per side <input id="b-n" type="number" min="1" max="64" /></label>
+            </div>
+            <label class="no-lego">Rows
+              <select id="b-lattice"><option value="straight">Straight</option><option value="bond">Offset every other row</option></select></label>
+          </section>
+        </div>
+        <div class="bd-right">
+          <canvas id="b-preview"></canvas>
+          <p id="b-summary"></p>
+          <p class="hint edit-only">Resizing keeps the design centered.</p>
+        </div>
+      </div>
+      <menu>
+        <button type="button" id="b-import" class="new-only">Import design file…</button>
+        <span class="spacer"></span>
+        <button type="button" id="b-cancel">Cancel</button>
+        <button type="submit" class="primary" id="b-ok">Create</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <dialog id="gallery-dlg">
+    <div class="gal-head">
+      <h2>My Designs</h2>
+      <span class="spacer"></span>
+      <button id="g-close">Close</button>
+    </div>
+    <div id="gallery"></div>
+  </dialog>
+
+  <dialog id="color-dlg">
+    <form id="color-form">
+      <h2 id="color-title">Add color</h2>
+      <div class="row">
+        <span id="color-preview"></span>
+        <label>Hex or R, G, B <input id="color-text" placeholder="#f4b000 or 244, 176, 0" spellcheck="false" autocomplete="off" /></label>
+        <label class="native">Picker <input type="color" id="color-native" /></label>
+      </div>
+      <label>Name <input id="color-name" placeholder="e.g. Cheddar" autocomplete="off" /></label>
+      <label class="check"><input type="checkbox" id="color-use" checked /> Use when converting photos</label>
+      <p class="hint">Or press on a bead in a photo:</p>
+      <div class="pick-wrap">
+        <canvas id="pick-canvas" width="480" height="300"></canvas>
+        <span id="pick-hint">Load a photo of your beads, then press on one</span>
+      </div>
+      <canvas id="loupe" width="120" height="120" hidden></canvas>
+      <menu>
+        <button type="button" id="pick-load">Load photo…</button>
+        <button type="button" id="color-clear" class="edit-only">Remove from design</button>
+        <button type="button" id="color-delete" class="edit-only danger">Delete</button>
+        <span class="spacer"></span>
+        <button type="button" id="color-cancel">Cancel</button>
+        <button type="submit" class="primary">Save</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <dialog id="print-dlg">
+    <form id="print-form">
+      <h2>Print</h2>
+      <label class="check"><input type="radio" name="mode" value="real" checked /> Real size (tiles across pages)</label>
+      <label class="check"><input type="radio" name="mode" value="fit" /> Shrink to fit one page</label>
+      <label>Paper <select id="p-paper"><option value="letter">Letter</option><option value="a4">A4</option></select></label>
+      <label>Cell size in mm <input id="p-pitch" type="number" min="1" max="50" step="0.1" required /></label>
+      <p class="hint">Real size needs the print dialog's scale at 100%. If a test print measures off, adjust the cell size; this design remembers it.</p>
+      <menu>
+        <span class="spacer"></span>
+        <button type="button" id="p-cancel">Cancel</button>
+        <button type="submit" class="primary">Print</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <div id="update-banner" role="status" hidden>
+    <span id="update-text"></span>
+    <progress id="update-progress" hidden></progress>
+    <button type="button" id="update-notes">What's new</button>
+    <button type="button" id="update-github" hidden>Download from GitHub</button>
+    <button type="button" id="update-later">Later</button>
+    <button type="button" id="update-now" class="primary">Update now</button>
+  </div>
+
+  <dialog id="notes-dlg">
+    <h2 id="notes-title"></h2>
+    <pre id="notes-body"></pre>
+    <menu><span class="spacer"></span><button type="button" id="notes-close" class="primary">Close</button></menu>
+  </dialog>
+
+  <div id="toast" role="status"></div>
+  <div id="print-root"></div>
+</body>
+</html>

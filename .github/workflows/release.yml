@@ -1,0 +1,95 @@
+# Push a tag like v0.3.0 (npm run release -- 0.3.0 "notes") to build and publish a release.
+# 1. create-release: a draft release whose notes come from the tag message
+# 2. build: macOS (universal: Apple silicon + Intel) and Windows installers, signed for the updater
+# 3. publish: writes latest.json (what the in-app updater reads) once, then publishes the release
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      id: ${{ steps.release.outputs.id }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Draft release from the tag message
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch --force origin "refs/tags/$GITHUB_REF_NAME:refs/tags/$GITHUB_REF_NAME"
+          notes=$(git tag -l --format='%(contents)' "$GITHUB_REF_NAME")
+          id=$(gh api -X POST "repos/$GITHUB_REPOSITORY/releases" \
+            -f tag_name="$GITHUB_REF_NAME" -f name="Beadboard ${GITHUB_REF_NAME#v}" \
+            -f body="$notes" -F draft=true --jq .id)
+          echo "id=$id" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: create-release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            args: --target universal-apple-darwin
+            rust-targets: aarch64-apple-darwin,x86_64-apple-darwin
+          - os: windows-latest
+            args: ''
+            rust-targets: ''
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust-targets }}
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+      - run: npm ci
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          releaseId: ${{ needs.create-release.outputs.id }}
+          includeUpdaterJson: false # written once by the publish job, so parallel builds can't overwrite each other
+          args: ${{ matrix.args }}
+
+  publish:
+    needs: [create-release, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Write latest.json and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ID: ${{ needs.create-release.outputs.id }}
+        run: |
+          set -euo pipefail
+          tag="$GITHUB_REF_NAME"
+          assets=$(gh api "repos/$GITHUB_REPOSITORY/releases/$ID/assets" --paginate)
+          name() { jq -r --arg s "$1" '[.[] | select(.name | endswith($s))][0].name // empty' <<<"$assets"; }
+          sig() { gh api -H 'Accept: application/octet-stream' "$(jq -r --arg n "$1.sig" '.[] | select(.name == $n) | .url' <<<"$assets")"; }
+          url() { echo "https://github.com/$GITHUB_REPOSITORY/releases/download/$tag/$1"; }
+          mac=$(name .app.tar.gz); win=$(name -setup.exe)
+          [ -n "$mac" ] && [ -n "$win" ] || { echo "missing updater bundles: mac='$mac' win='$win'"; exit 1; }
+          notes=$(gh api "repos/$GITHUB_REPOSITORY/releases/$ID" --jq .body)
+          jq -n --arg v "${tag#v}" --arg notes "$notes" --arg date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg mu "$(url "$mac")" --arg ms "$(sig "$mac")" --arg wu "$(url "$win")" --arg ws "$(sig "$win")" \
+            '{version: $v, notes: $notes, pub_date: $date, platforms: {
+               "darwin-aarch64": {url: $mu, signature: $ms},
+               "darwin-x86_64": {url: $mu, signature: $ms},
+               "windows-x86_64": {url: $wu, signature: $ws}}}' > latest.json
+          cat latest.json
+          gh release upload "$tag" latest.json --repo "$GITHUB_REPOSITORY" --clobber
+          gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$ID" -F draft=false -f make_latest=true > /dev/null
