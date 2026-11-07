@@ -15,6 +15,7 @@
       <input id="name" class="needs-design" aria-label="Design name" placeholder="Untitled" spellcheck="false" />
       <span id="save-status" class="needs-design" role="status"></span>
       <span class="spacer"></span>
+      <span id="update-pill" role="status" hidden><span id="update-pill-text"></span><button type="button" id="update-restart" class="primary" hidden title="Restart Beadboard to finish updating. Your work is saved first.">Restart</button></span>
       <span id="hl-chip" hidden>Highlighting <b></b><button type="button" id="hl-clear" aria-label="Stop highlighting">✕</button></span>
       <button id="btn-photo-toggle" class="toggle" hidden title="Show the photo under the design (⇧⌘P)">
         <svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></svg><span>Photo</span></button>
@@ -126,6 +127,7 @@
     <div class="gal-head">
       <h2>My Designs</h2>
       <span class="spacer"></span>
+      <span id="g-updates" hidden><small id="g-version"></small><button type="button" id="g-check">Check for updates</button></span>
       <button id="g-close">Close</button>
     </div>
     <div id="gallery"></div>
@@ -176,11 +178,10 @@
 
   <div id="update-banner" role="status" hidden>
     <span id="update-text"></span>
-    <progress id="update-progress" hidden></progress>
     <button type="button" id="update-notes">What's new</button>
     <button type="button" id="update-github" hidden>Download from GitHub</button>
     <button type="button" id="update-later">Later</button>
-    <button type="button" id="update-now" class="primary">Update now</button>
+    <button type="button" id="update-now" class="primary">Update</button>
   </div>
 
   <dialog id="notes-dlg">

@@ -1,29 +1,29 @@
 # Graph Report - jess-gift  (2026-11-07)
 
 ## Corpus Check
-- 26 files · ~18,394 words
+- 26 files · ~18,680 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 6 file(s) not represented in the graph (top: (none) 3, .icns 1, .ico 1)
 
 ## Summary
-- 368 nodes · 693 edges · 20 communities (14 shown, 6 thin omitted)
+- 371 nodes · 698 edges · 19 communities (14 shown, 5 thin omitted)
 - Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 27 edges (avg confidence: 0.84)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a262f137`
+- Built from commit: `4063b6e9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - UI Controller & Canvas Events
-- Mosaic Grid Core Logic
+- initPalette
 - Release CI Workflow
-- Design Export & Rendering
+- core.js
 - Project Overview & Docs
 - Tauri App Configuration
 - Design Storage & Persistence
-- Board Dialog & Presets
+- render.js
 - CI Test Workflow
 - Package Manifest & Scripts
 - App Menu & Shortcuts
@@ -65,23 +65,23 @@
 - **Design Editing Workflow** — src_index_board_dialog, src_index_toolbar, src_index_editor_canvas, src_index_palette_panel, src_index_iso_canvas [INFERRED 0.85]
 - **Release & Auto-Update Pipeline** — readme_release_process, readme_github_actions, readme_signing_key, readme_auto_update [INFERRED 0.85]
 
-## Communities (20 total, 6 thin omitted)
+## Communities (19 total, 5 thin omitted)
 
 ### Community 0 - "UI Controller & Canvas Events"
 Cohesion: 0.06
 Nodes (59): actions, applyAt(), applyTheme(), boardDialog, cancelStroke(), changed(), check(), closeDialogs() (+51 more)
 
-### Community 1 - "Mosaic Grid Core Logic"
-Cohesion: 0.09
-Nodes (41): averageBox(), boardCenter(), clamp(), clearColor(), counts(), dims(), each(), emptyCells() (+33 more)
+### Community 1 - "initPalette"
+Cohesion: 0.23
+Nodes (18): averageBox(), parseColor(), removeColor(), rgbToHex(), initPalette(), drawPick(), open(), render() (+10 more)
 
 ### Community 2 - "Release CI Workflow"
 Cohesion: 0.05
 Nodes (45): needs, runs-on, steps, strategy, outputs, runs-on, steps, GH_TOKEN (+37 more)
 
-### Community 3 - "Design Export & Rendering"
-Cohesion: 0.14
-Nodes (35): clampView(), paint(), hexToRgb(), labels(), luminance(), maxHeight(), stackable(), top() (+27 more)
+### Community 3 - "core.js"
+Cohesion: 0.09
+Nodes (38): clamp(), clearColor(), counts(), each(), fill(), hexRow(), hexToRgb(), label() (+30 more)
 
 ### Community 4 - "Project Overview & Docs"
 Cohesion: 0.07
@@ -95,9 +95,9 @@ Nodes (22): app, security, windows, withGlobalTauri, build, frontendDist, bundle
 Cohesion: 0.17
 Nodes (13): ensureDirs(), getDesign(), KINDS, listDesigns(), loadBackup(), loadPalette(), MIME, native (+5 more)
 
-### Community 7 - "Board Dialog & Presets"
-Cohesion: 0.24
-Nodes (13): initBoardDialog(), applyPreset(), card(), preview(), readFields(), render(), syncFields(), SAMPLE (+5 more)
+### Community 7 - "render.js"
+Cohesion: 0.13
+Nodes (33): clampView(), paint(), initBoardDialog(), applyPreset(), card(), preview(), readFields(), render() (+25 more)
 
 ### Community 8 - "CI Test Workflow"
 Cohesion: 0.14
@@ -120,28 +120,28 @@ Cohesion: 0.33
 Nodes (5): description, identifier, permissions, $schema, windows
 
 ### Community 13 - "Auto-Update Logic"
-Cohesion: 0.47
-Nodes (4): initUpdater(), check(), offer(), openReleases()
+Cohesion: 0.33
+Nodes (8): initUpdater(), check(), download(), failed(), offer(), restart(), openReleases(), WINDOWS
 
 ## Knowledge Gaps
 - **13 isolated node(s):** `beadboard`, `App Icon: Bead Heart on Pegboard`, `app.js (main script)`, `Photo underlay & opacity toggle`, `Color-pick canvas & loupe (#pick-canvas)` (+8 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 140 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **5 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `render()` connect `Board Dialog & Presets` to `Release Script`?**
-  _High betweenness centrality (0.026) - this node is a cross-community bridge._
+- **Why does `render()` connect `render.js` to `Release Script`?**
+  _High betweenness centrality (0.025) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `initPalette()` (e.g. with `open()` and `render()`) actually correct?**
   _`initPalette()` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `beadboard`, `App Icon: Bead Heart on Pegboard`, `app.js (main script)` to the rest of the system?**
   _13 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `UI Controller & Canvas Events` be split into smaller, more focused modules?**
-  _Cohesion score 0.06057945566286216 - nodes in this community are weakly interconnected._
-- **Why does `initBoardDialog()` connect `Board Dialog & Presets` to `UI Controller & Canvas Events`, `Design Export & Rendering`?**
+  _Cohesion score 0.05970149253731343 - nodes in this community are weakly interconnected._
+- **Why does `initBoardDialog()` connect `render.js` to `UI Controller & Canvas Events`?**
   _High betweenness centrality (0.025) - this node is a cross-community bridge._
-- **Should `Mosaic Grid Core Logic` be split into smaller, more focused modules?**
-  _Cohesion score 0.09042553191489362 - nodes in this community are weakly interconnected._
-- **Why does `edit()` connect `Release Script` to `Board Dialog & Presets`?**
+- **Should `Release CI Workflow` be split into smaller, more focused modules?**
+  _Cohesion score 0.04927536231884058 - nodes in this community are weakly interconnected._
+- **Why does `edit()` connect `Release Script` to `render.js`?**
   _High betweenness centrality (0.022) - this node is a cross-community bridge._

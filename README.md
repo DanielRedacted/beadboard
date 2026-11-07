@@ -16,7 +16,7 @@ The app isn't code-signed, so the first launch shows a warning:
 - **macOS:** "can't be opened because Apple cannot check it". Right-click the app, choose **Open**, then **Open** again. If macOS says it's damaged, run `xattr -cr /Applications/Beadboard.app` once in Terminal.
 - **Windows:** "Windows protected your PC". Click **More info**, then **Run anyway**.
 
-After that the app checks for updates on its own, at launch and every few hours while open. You can also check from **Beadboard > Check for Updates…** on Mac, or **Help > Check for Updates…** on Windows.
+After that, Beadboard checks for updates each time it opens. Clicking **Update** downloads the new version in the background while you keep working, then a **Restart** button appears at the top of the window. To check by hand, use **Check for updates** in My Designs, **Beadboard > Check for Updates…** on Mac, or **Help > Check for Updates…** on Windows.
 
 ## Develop
 

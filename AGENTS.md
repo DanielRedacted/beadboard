@@ -83,4 +83,5 @@ A local `npm run build` needs the updater signing key in the environment; see RE
 - Photo import on stackable LEGO slides a layer *under* every column. Every other medium overwrites the grid after a confirm.
 - There is one saved palette per medium (`palettes/<medium>.json`), and every design embeds its own palette copy.
 - Touch mode follows the last pointer type used. A two-finger tap undoes and a three-finger tap redoes. On touch, the fill and pick tools fire when the finger lifts.
+- Updates: one silent check when the app opens, plus the manual "Check for updates" button in My Designs and the menu item. Never add periodic checks. Clicking Update downloads in the background, and on macOS also installs; the user keeps working, and a header Restart button finishes it. On Windows, install runs at Restart because the installer must close the app.
 - Autosave runs about 600 ms after edits. File > Save also writes `<id>.bak`, which Revert to Saved restores. Writes are atomic: temp file, then rename.
